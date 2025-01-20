@@ -7,6 +7,7 @@ class BlockChain:
         self.difficulty = difficulty
         self.pending_transactions = []
         self.mining_reward = 1
+        self.fee = 0.1
         self.wallets = {}
         self.initial_distribution = {}
         
@@ -29,12 +30,14 @@ class BlockChain:
             for transaction in block.transactions:
                 if transaction["sender"] == address:
                     balance -= transaction["amount"]
+                    balance -= self.fee
                 if transaction["receiver"] == address:
                     balance += transaction["amount"]
         
         for transaction in self.pending_transactions:
             if transaction["sender"] == address:
                 balance -= transaction["amount"]
+                balance -= self.fee
             if transaction["receiver"] == address:
                 balance += transaction["amount"]
                 
@@ -68,19 +71,21 @@ class BlockChain:
                 raise ValueError("Invalid transaction signature")
             
             if not self.verify_transaction(transaction):
-                raise ValueError(f"Insufficient funds. {transaction['sender']} only has {self.get_balance(transaction['sender'])} AC.")
+                raise ValueError(f"Insufficient funds. {transaction['sender']} only has {self.get_balance(transaction['sender'])} C.")
         
         self.pending_transactions.append(transaction)
 
     def mine_pending_transactions(self, miner_address):
         if not self.pending_transactions:
             raise ValueError("No transactions to mine.")
-        
+
+        total_fees = len(self.pending_transactions) * self.fee
+
         reward_transaction = {
             "sender": "System",
             "receiver": miner_address,
-            "amount": self.mining_reward,
-            "signature": "mining_reward"
+            "amount": self.mining_reward + total_fees,
+            "signature": "mining_reward and transaction fees"
         }
         self.pending_transactions.append(reward_transaction)
 

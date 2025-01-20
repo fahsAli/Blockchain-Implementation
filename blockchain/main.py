@@ -51,3 +51,5 @@ print()
 
 for block in blockchain.chain:
     print(block)
+
+print()

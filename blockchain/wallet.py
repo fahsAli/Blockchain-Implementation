@@ -23,11 +23,10 @@ class Wallet:
         transaction = {
             "sender": self.address,
             "receiver": receiver_address,
-            "amount": amount
+            "amount": amount,
         }
         
         signature = self.sign_transaction(transaction)
-        
         transaction["signature"] = signature
         return transaction
     
